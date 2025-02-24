@@ -1,5 +1,15 @@
+if not GameHook then
+    dofile "$CONTENT_a4a143b1-eaad-4dcc-b0d9-7e426ed26af4/Scripts/GameHook.lua"
+end
+
 --Get the world creation data that was given to us by sm.world.createWorld.
-local terrainData = sm[sm.TERRAINOVERRIDEMODUUID]
+local terrainData = sm[sm.TERRAINOVERRIDEMODUUID] or {
+    filename = "$GAME_DATA/Scripts/game/worlds/CreativeTerrainWorld.lua",
+    classname = "CreativeTerrainWorld",
+    terrainParams = {},
+    seed = 69420,
+    terrainType = 1,
+}
 
 --Load the world script that the game was intending to use, we need to retain it's functionality.
 dofile(terrainData.filename)

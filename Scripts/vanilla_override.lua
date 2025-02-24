@@ -13,10 +13,6 @@ if sm[sm.TERRAINOVERRIDEMODUUID] == nil then
     if terrainData then
         sm.log.warning("[TERRAIN OVERRIDE] LOADED SAVED TERRAIN DATA:", terrainData)
 
-        --This function will be used by the OverrideWorld class to import the
-        --game's globals into the mod's environment, since they are not shared.
-        sm[sm.TERRAINOVERRIDEMODUUID .. "GetGameGlobals"] = function() return _G end
-
         --Load the terrain data into the sm. table.
         sm[sm.TERRAINOVERRIDEMODUUID] = terrainData
     else
@@ -25,6 +21,10 @@ if sm[sm.TERRAINOVERRIDEMODUUID] == nil then
             terrainType = 1,
         }
     end
+
+    --This function will be used by the OverrideWorld class to import the
+    --game's globals into the mod's environment, since they are not shared.
+    sm[sm.TERRAINOVERRIDEMODUUID .. "GetGameGlobals"] = function() return _G end
 end
 
 --The function responsible for creating OverrideWorld, this will be called in GameHook
