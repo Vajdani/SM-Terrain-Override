@@ -45,36 +45,53 @@ end
 
 ----------------------------------------------------------------------------------------------------
 
+local discradCell = {
+	-- [9] = true,
+	[10] = true,
+	[11] = true,
+	[12] = true,
+	[13] = true,
+	[14] = true,
+	[15] = true,
+	[16] = true,
+}
+
 local function initializeCellData( xMin, xMax, yMin, yMax, seed )
 	-- Version history:
 	-- 2:	Changes integer 'tileId' to 'uid' from tile uuid
 	--		Renamed 'tileOffsetX' -> 'xOffset'
 	--		Renamed 'tileOffsetY' -> 'yOffset'
 	--		Added 'version'
-	
+
+	-- 1337: Regenerate world for override
+
 	g_cellData = {
 		bounds = { xMin = xMin, xMax = xMax, yMin = yMin, yMax = yMax },
 		seed = seed,
 		-- Per Cell
-		uid = {},
-		xOffset = {},
-		yOffset = {},
-		rotation = {},
-		version = 2
+		uid = (g_cellData or {}).uid or {},
+		xOffset = (g_cellData or {}).xOffset or {},
+		yOffset = (g_cellData or {}).yOffset or {},
+		rotation = (g_cellData or {}).rotation or {},
+		version = 1337
 	}
 
 	-- Cells
 	for cellY = yMin, yMax do
-		g_cellData.uid[cellY] = {}
-		g_cellData.xOffset[cellY] = {}
-		g_cellData.yOffset[cellY] = {}
-		g_cellData.rotation[cellY] = {}
+		if g_cellData.uid[cellY] == nil or discradCell[math.abs(cellY)] == true then
+			g_cellData.uid[cellY] = {}
+			g_cellData.xOffset[cellY] = {}
+			g_cellData.yOffset[cellY] = {}
+			g_cellData.rotation[cellY] = {}
+		end
 
 		for cellX = xMin, xMax do
-			g_cellData.uid[cellY][cellX] = sm.uuid.getNil()
-			g_cellData.xOffset[cellY][cellX] = 0
-			g_cellData.yOffset[cellY][cellX] = 0
-			g_cellData.rotation[cellY][cellX] = 0
+			if g_cellData.uid[cellY][cellX] == nil or discradCell[math.abs(cellX)] == true then
+				g_cellData.uid[cellY][cellX] = sm.uuid.getNil()
+				g_cellData.xOffset[cellY][cellX] = 0
+				g_cellData.yOffset[cellY][cellX] = 0
+				g_cellData.rotation[cellY][cellX] = 0
+			end
 		end
 	end
 end
@@ -110,6 +127,58 @@ function Create( xMin, xMax, yMin, yMax, seed )
 
 	sm.terrainData.save( g_cellData )
 end
+
+
+
+function UpgradeCellData( cellData )
+	sm.log.info( "UpgradeCellData - version: "..tostring( cellData.version or 1 ) )
+	local upgraded = false
+	-- 1 to 2
+	if ( cellData.version or 1 ) < 2 then
+		cellData.xOffset = cellData.tileOffsetX 		-- rename offset x table
+		cellData.tileOffsetX = nil
+
+		cellData.yOffset = cellData.tileOffsetY 		-- rename offset y table
+		cellData.tileOffsetY = nil
+
+		if cellData.uid == nil then
+			cellData.uid = {}							-- add uid table
+		end
+
+		for cellY = cellData.bounds.yMin, cellData.bounds.yMax do
+			if cellData.uid[cellY] == nil then
+				cellData.uid[cellY] = {}				-- add uid table
+			end
+
+			for cellX = cellData.bounds.xMin, cellData.bounds.xMax do
+				if cellData.uid[cellY][cellX] == nil then
+					cellData.uid[cellY][cellX] = {}		-- add uid table
+				end
+				local id = cellData.tileId[cellY][cellX]
+				local uid = GetLegacyUpgrade( id )
+				if not sm.uuid.isNil( uid ) then
+					cellData.uid[cellY][cellX] = uid -- (int) tileId -> (uuid) uid
+				else
+					cellData.uid[cellY][cellX] = sm.uuid.getNil()
+				end
+			end
+		end
+		cellData.version = 2
+		upgraded = true
+	end
+
+	if cellData.version < 1337 then
+		Create( -64, 63, -64, 63, cellData.seed )
+
+		cellData.version = 1337
+		upgraded = true
+	end
+
+	if upgraded then sm.log.info( "	- Upgraded to version "..tostring( cellData.version ) ) else sm.log.info( "	- No upgrade needed" ) end
+	return upgraded
+end
+
+
 
 ----------------------------------------------------------------------------------------------------
 

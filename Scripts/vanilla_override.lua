@@ -15,18 +15,21 @@ if sm[sm.TERRAINOVERRIDEMODUUID] == nil then
 
         --This function will be used by the OverrideWorld class to import the
         --game's globals into the mod's environment, since they are not shared.
-        sm[sm.TERRAINOVERRIDEMODUUID.."GetGameGlobals"] = function() return _G end
+        sm[sm.TERRAINOVERRIDEMODUUID .. "GetGameGlobals"] = function() return _G end
 
         --Load the terrain data into the sm. table.
         sm[sm.TERRAINOVERRIDEMODUUID] = terrainData
     else
         sm.log.warning("[TERRAIN OVERRIDE] TERRAIN DATA NOT YET SAVED, SKIP LOAD")
+        sm[sm.TERRAINOVERRIDEMODUUID] = {
+            terrainType = 1,
+        }
     end
 end
 
 --The function responsible for creating OverrideWorld, this will be called in GameHook
 --by the new sm.world.createWorld function.
-sm[sm.TERRAINOVERRIDEMODUUID.."_createOverrideWorld"] = function(filename, classname, terrainParams, seed)
+sm[sm.TERRAINOVERRIDEMODUUID .. "_createOverrideWorld"] = function(filename, classname, terrainParams, seed)
     sm.log.warning("[TERRAIN OVERRIDE] CREATE WORLD")
 
     --Assemble a table with the world creation data
@@ -45,22 +48,103 @@ sm[sm.TERRAINOVERRIDEMODUUID.."_createOverrideWorld"] = function(filename, class
 
     --This function will be used by the OverrideWorld class to import the
     --game's globals into the mod's environment, since they are not shared.
-    sm[sm.TERRAINOVERRIDEMODUUID.."GetGameGlobals"] = function() return _G end
+    sm[sm.TERRAINOVERRIDEMODUUID .. "GetGameGlobals"] = function() return _G end
 
     --Load the terrain data into the sm. table.
     sm[sm.TERRAINOVERRIDEMODUUID] = terrainData
 
     --Create OverrideWorld using the original sm.world.createWorld function.
     --We pass the path to the mod's OverrideWorld script, but pass on all of the original world creation arguments.
-    return sm[sm.TERRAINOVERRIDEMODUUID.."_oldCreateWorld"]("$CONTENT_"..sm.TERRAINOVERRIDEMODUUID.."/Scripts/OverrideWorld.lua", classname, terrainParams, seed)
+    return sm[sm.TERRAINOVERRIDEMODUUID .. "_oldCreateWorld"]("$CONTENT_" .. sm.TERRAINOVERRIDEMODUUID .. "/Scripts/OverrideWorld.lua", classname, terrainParams, seed)
 end
 
 for k, v in pairs(_G) do
     if type(v) == "table" and v.server_onPlayerJoined then
         function v:server_saveNewTerrainData()
-            print("jhsfjkhsjkfhk")
             sm.storage.saveAndSync(sm.TERRAINOVERRIDEMODUUID, sm[sm.TERRAINOVERRIDEMODUUID])
-            print(sm.storage.load(sm.TERRAINOVERRIDEMODUUID))
         end
     end
+end
+
+
+
+local fieldReplacements = {
+    {
+        terrainScript = ("$CONTENT_%s/Scripts/terrain/%s.lua"):format(sm.TERRAINOVERRIDEMODUUID, "terrain_creative_override"),
+        groundMaterialSet = "$GAME_DATA/Terrain/Materials/gnd_standard_materialset.json",
+        cellMinX = -64,
+        cellMaxX = 63,
+        cellMinY = -64,
+        cellMaxY = 63,
+        isStatic = false,
+    },
+    {
+        terrainScript = ("$CONTENT_%s/Scripts/terrain/%s.lua"):format(sm.TERRAINOVERRIDEMODUUID, "terrain_flat_override"),
+        groundMaterialSet = "$GAME_DATA/Terrain/Materials/gnd_flat_materialset.json",
+        cellMinX = -64,
+        cellMaxX = 63,
+        cellMinY = -64,
+        cellMaxY = 63,
+        isStatic = false,
+    },
+    {
+        terrainScript = ("$CONTENT_%s/Scripts/terrain/%s.lua"):format(sm.TERRAINOVERRIDEMODUUID, "terrain_snow"),
+        groundMaterialSet = "$CONTENT_"..sm.TERRAINOVERRIDEMODUUID.."/terrain/gnd_snow_materialset.json",
+        cellMinX = -64,
+        cellMaxX = 63,
+        cellMinY = -64,
+        cellMaxY = 63,
+        isStatic = false,
+    },
+}
+
+--Credit to crackx for the code below
+--TL;DR: We do some magic so that we can intercept when the game
+--is setting up the world class's variables, and instead, we assign our own.
+oClass = oClass or class
+local function CreateMetaTable(metatable, tbl)
+    local cls = oClass(metatable)
+    cls.__index = metatable.__index
+    local instance = cls()
+    if (tbl ~= nil) then
+        cls.__newindex = nil
+        for k, v in pairs(tbl) do
+            instance[k] = v
+        end
+        cls.__newindex = metatable.__newindex
+    end
+    return instance, cls
+end
+
+function class(super)
+    local _meta = {}
+    local cls, meta = CreateMetaTable(_meta, oClass(super))
+    cls.__index = cls
+    function meta.__call(self)
+        return CreateMetaTable(self)
+    end
+
+    function meta.__newindex(self, k, v)
+        local newindex = meta.__newindex
+        meta.__newindex = nil
+
+        --Here is where the game is trying to adjust the value of
+        --one of the world class parameters.
+        --We check if our terranData contains a value for that parameter, and if it does
+        --we set the parameter's value to it, thus replacing the game's value.
+        local terrainData = fieldReplacements[sm[sm.TERRAINOVERRIDEMODUUID].terrainType]
+        if terrainData[k] ~= nil then
+            cls[k] = terrainData[k]
+
+            --Some parameters may not get set by the game, so we make sure to set them manually.
+            cls["isStatic"] = terrainData.isStatic
+            cls["groundMaterialSet"] = terrainData.groundMaterialSet
+        else
+            cls[k] = v
+        end
+
+        meta.__newindex = newindex
+    end
+
+    return cls
 end
