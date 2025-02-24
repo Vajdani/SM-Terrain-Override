@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MyGUI type="Layout" version="3.2.0">
+    <Widget type="Widget" skin="PanelEmpty" position_real="0 0 1 1" name="BackPanel">
+        <Widget type="Widget" skin="BackgroundPopup" position_real="0.36979166666666669 0.38425925925925924 0.26041666666666669 0.23148148148148148" name="MainPanelNoUpgrade">
+            <Property key="NeedKey" value="false"/>
+            <Property key="NeedMouse" value="true"/>
+            <Property key="InheritsAlpha" value="false"/>
+            <Widget type="TextBox" skin="TextBox" position_real="0.10000000000000001 0.20000000000000001 0.80000000000000004 0.16" name="Name">
+                <Property key="Caption" value="Name Of the Interactable"/>
+                <Property key="FontName" value="SM_HeaderLarge_Wide"/>
+                <Property key="TextAlign" value="Center"/>
+            </Widget>
+            <Widget type="TextBox" skin="TextBox" position_real="0.10000000000000001 0.35999999999999999 0.80000000000000004 0.12" name="SubTitle">
+                <Property key="TextAlign" value="Center"/>
+                <Property key="TextColour" value="1 0.803922 0.247059"/>
+                <Property key="FontName" value="SM_SubHeader"/>
+                <Property key="Caption" value="Change What?"/>
+            </Widget>
+            <Widget type="Canvas" skin="Canvas" position_real="0.10000000000000001 0.59999999999999998 0.80000000000000004 0.20000000000000001" name="items"/>
+        </Widget>
+    </Widget>
+    <CodeGeneratorSettings/>
+</MyGUI>

@@ -1,0 +1,77 @@
+{
+	"groundMaterials": 
+	{
+		"width" : 1024,
+		"height" : 1024,
+		"textures":
+		[
+			{
+				"name": "Concrete", 
+				"diffuse": "$GAME_DATA/Terrain/Textures/Ground/gnd_0_dif.tga",
+				"asgMap": "$GAME_DATA/Terrain/Textures/Ground/gnd_0_asg.tga",
+				"normalMap": "$GAME_DATA/Terrain/Textures/Ground/gnd_0_nor.tga"
+
+				// "name": "Snow", 
+				// "diffuse": "$CONTENT_DATA/Terrain/snow01_dif.png",
+				// "asgMap": "$GAME_DATA/Textures/Default/default_asg.tga",
+				// "normalMap": "$CONTENT_DATA/Terrain/snow01_nor.png"
+			},
+			{
+				"name": "Snow",
+				"diffuse": "$CONTENT_DATA/Terrain/snow01_dif.png",
+				"asgMap": "$GAME_DATA/Textures/Default/default_asg.tga",
+				"normalMap": "$CONTENT_DATA/Terrain/snow01_nor.png"
+			},
+			{
+				"name": "Stone",
+				"diffuse": "$GAME_DATA/Terrain/Textures/Ground/gnd_2_dif.tga",
+				"asgMap": "$GAME_DATA/Terrain/Textures/Ground/gnd_2_asg.tga",
+				"normalMap": "$GAME_DATA/Terrain/Textures/Ground/gnd_2_nor.tga"
+				// "name": "Snow",
+				// "diffuse": "$CONTENT_DATA/Terrain/snow01_dif.png",
+				// "asgMap": "$GAME_DATA/Textures/Default/default_asg.tga",
+				// "normalMap": "$CONTENT_DATA/Terrain/snow01_nor.png"
+			},
+			{
+				"name": "Snow",
+				"diffuse": "$CONTENT_DATA/Terrain/snow01_dif.png",
+				"asgMap": "$GAME_DATA/Textures/Default/default_asg.tga",
+				"normalMap": "$CONTENT_DATA/Terrain/snow01_nor.png"
+			},
+			{
+				"name": "Snow",
+				"diffuse": "$CONTENT_DATA/Terrain/snow01_dif.png",
+				"asgMap": "$GAME_DATA/Textures/Default/default_asg.tga",
+				"normalMap": "$CONTENT_DATA/Terrain/snow01_nor.png"
+			},
+			{
+				"name": "Rough Stone",
+				"diffuse": "$GAME_DATA/Terrain/Textures/Ground/gnd_5_dif.tga",
+				"asgMap": "$GAME_DATA/Terrain/Textures/Ground/gnd_5_asg.tga",
+				"normalMap": "$GAME_DATA/Terrain/Textures/Ground/gnd_5_nor.tga"
+				// "name": "Snow",
+				// "diffuse": "$CONTENT_DATA/Terrain/snow01_dif.png",
+				// "asgMap": "$GAME_DATA/Textures/Default/default_asg.tga",
+				// "normalMap": "$CONTENT_DATA/Terrain/snow01_nor.png"
+			},
+			{
+				"name": "Snow",
+				"diffuse": "$CONTENT_DATA/Terrain/snow01_dif.png",
+				"asgMap": "$GAME_DATA/Textures/Default/default_asg.tga",
+				"normalMap": "$CONTENT_DATA/Terrain/snow01_nor.png"
+			},
+			{
+				"name": "Snow",
+				"diffuse": "$CONTENT_DATA/Terrain/snow01_dif.png",
+				"asgMap": "$GAME_DATA/Textures/Default/default_asg.tga",
+				"normalMap": "$CONTENT_DATA/Terrain/snow01_nor.png"
+			},
+			{
+				"name": "Snow",
+				"diffuse": "$CONTENT_DATA/Terrain/snow01_dif.png",
+				"asgMap": "$GAME_DATA/Textures/Default/default_asg.tga",
+				"normalMap": "$CONTENT_DATA/Terrain/snow01_nor.png"
+			}
+		]		
+	}
+}

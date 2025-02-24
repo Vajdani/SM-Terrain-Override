@@ -1,0 +1,16 @@
+{
+   "toolList" : [
+      {
+         "name" : "GameHook",
+         "previewRenderable" : "$GAME_DATA/Character/Char_Tools/char_connecttool_preview.rend",
+         "previewRotation" : [ 1, 0, 0, 0, 0, -1, 0, 1, 0 ],
+         "script" : {
+            "class" : "GameHook",
+            "data" : {},
+            "file" : "$CONTENT_DATA/Scripts/GameHook.lua"
+         },
+         "autoTool": true,
+         "uuid" : "e504e7b8-6a66-4cfb-816e-b664decf9757"
+      }
+   ]
+}

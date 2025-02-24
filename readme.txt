@@ -1,0 +1,2 @@
+Don't forget to change the mod's UUID in description.json, and the GameHoook autoTool's uuid in Tools/DataBase/ToolSets/tools.toolset.
+If you wish to use the default terrain generation script, you will also have to change the mod UUID in Scripts/terrain_creative_override.lua
