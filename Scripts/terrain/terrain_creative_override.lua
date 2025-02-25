@@ -45,7 +45,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 
-local discradCell = {
+local discardCell = {
 	-- [9] = true,
 	[10] = true,
 	[11] = true,
@@ -78,7 +78,7 @@ local function initializeCellData( xMin, xMax, yMin, yMax, seed )
 
 	-- Cells
 	for cellY = yMin, yMax do
-		if g_cellData.uid[cellY] == nil or discradCell[math.abs(cellY)] == true then
+		if g_cellData.uid[cellY] == nil or discardCell[math.abs(cellY)] == true then
 			g_cellData.uid[cellY] = {}
 			g_cellData.xOffset[cellY] = {}
 			g_cellData.yOffset[cellY] = {}
@@ -86,7 +86,7 @@ local function initializeCellData( xMin, xMax, yMin, yMax, seed )
 		end
 
 		for cellX = xMin, xMax do
-			if g_cellData.uid[cellY][cellX] == nil or discradCell[math.abs(cellX)] == true then
+			if g_cellData.uid[cellY][cellX] == nil or discardCell[math.abs(cellX)] == true then
 				g_cellData.uid[cellY][cellX] = sm.uuid.getNil()
 				g_cellData.xOffset[cellY][cellX] = 0
 				g_cellData.yOffset[cellY][cellX] = 0
