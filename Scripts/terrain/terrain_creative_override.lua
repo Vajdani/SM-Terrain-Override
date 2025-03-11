@@ -17,7 +17,7 @@ dofile("$SURVIVAL_DATA/scripts/terrain/overworld/tile_database.lua")
 
 --How many cells wide the water border should be.
 local WATER_WIDTH = 32
-local WORLD_SIZE = 128
+local WORLD_SIZE = 127
 
 function Init()
 	print( "Initializing creative terrain" )

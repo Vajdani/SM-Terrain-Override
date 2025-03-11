@@ -68,32 +68,38 @@ end
 
 
 
+local size = 127
+local cellMinX = -size
+local cellMaxX = size - 1
+local cellMinY = -size
+local cellMaxY = size - 1
+
 local fieldReplacements = {
     {
         terrainScript = ("$CONTENT_%s/Scripts/terrain/%s.lua"):format(sm.TERRAINOVERRIDEMODUUID, "terrain_creative_override"),
         groundMaterialSet = "$GAME_DATA/Terrain/Materials/gnd_standard_materialset.json",
-        cellMinX = -64,
-        cellMaxX = 63,
-        cellMinY = -64,
-        cellMaxY = 63,
+        cellMinX = cellMinX,
+        cellMaxX = cellMaxX,
+        cellMinY = cellMinY,
+        cellMaxY = cellMaxY,
         isStatic = false,
     },
     {
         terrainScript = ("$CONTENT_%s/Scripts/terrain/%s.lua"):format(sm.TERRAINOVERRIDEMODUUID, "terrain_flat_override"),
         groundMaterialSet = "$GAME_DATA/Terrain/Materials/gnd_flat_materialset.json",
-        cellMinX = -64,
-        cellMaxX = 63,
-        cellMinY = -64,
-        cellMaxY = 63,
+        cellMinX = cellMinX,
+        cellMaxX = cellMaxX,
+        cellMinY = cellMinY,
+        cellMaxY = cellMaxY,
         isStatic = false,
     },
     {
         terrainScript = ("$CONTENT_%s/Scripts/terrain/%s.lua"):format(sm.TERRAINOVERRIDEMODUUID, "terrain_snow"),
         groundMaterialSet = "$CONTENT_"..sm.TERRAINOVERRIDEMODUUID.."/terrain/gnd_snow_materialset.json",
-        cellMinX = -64,
-        cellMaxX = 63,
-        cellMinY = -64,
-        cellMaxY = 63,
+        cellMinX = cellMinX,
+        cellMaxX = cellMaxX,
+        cellMinY = cellMinY,
+        cellMaxY = cellMaxY,
         isStatic = false,
     },
 }
