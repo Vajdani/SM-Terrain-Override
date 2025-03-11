@@ -1,5 +1,9 @@
 ---@diagnostic disable:duplicate-set-field
 
+dofile("$CONTENT_40639a2c-bb9f-4d4f-b88c-41bfe264ffa8/Scripts/ModDatabase.lua")
+
+-- newDependencies = newDependencies or {}
+
 ---@class GameHook : ToolClass
 GameHook = class()
 
@@ -7,6 +11,10 @@ function GameHook:server_onCreate()
     if g_terrainOverrideGameHook then return end
 
     g_terrainOverrideGameHook = self.tool
+
+    -- local description = sm.json.open("$CONTENT_DATA/description.json")
+    -- concat(description.dependencies, newDependencies)
+    -- sm.json.save(description, "$CONTENT_DATA/description.json")
 end
 
 function GameHook:sv_switchTerrain(player)
@@ -74,6 +82,13 @@ sm.TERRAINOVERRIDEMODUUID = description.localId
 gameHooked = gameHooked or false
 
 commandsLoaded = commandsLoaded or false
+customTilesLoaded = customTilesLoaded or false
+
+local function concat( a, b )
+	for _, v in ipairs( b ) do
+		a[#a+1] = v;
+	end
+end
 
 --Imports the override script into the game's environment
 local function attemptHook()
@@ -84,6 +99,36 @@ local function attemptHook()
 
         --Load override script
         dofile("$CONTENT_"..sm.TERRAINOVERRIDEMODUUID.."/Scripts/vanilla_override.lua")
+    end
+
+    if not customTilesLoaded and sm.isServerMode() then
+        ModDatabase.loadShapesets()
+        local tiles = {}
+
+        -- local presentDependencies = {}
+        -- for k, v in pairs(description.dependencies) do
+        --     presentDependencies[v.fileId] = true
+        -- end
+
+        for k, uuid in pairs(ModDatabase.getAllLoadedMods()) do
+            local path = ("$CONTENT_%s/tileList.json"):format(uuid)
+            local success, result = pcall(sm.json.fileExists, path)
+            if success and result then
+                local data = sm.json.open(path)
+                concat(tiles, data.tiles)
+
+                -- for _k, dependency in pairs(data.dependencies) do
+                --     if presentDependencies[dependency.fileId] == nil then
+                --         table.insert(newDependencies, dependency)
+                --     end
+                -- end
+            end
+        end
+
+        sm.storage.save(sm.TERRAINOVERRIDEMODUUID.."_tileList", tiles)
+        --sm.json.save(tiles, "$CONTENT_"..sm.TERRAINOVERRIDEMODUUID.."/customTileList.json")
+
+        ModDatabase.unloadShapesets()
     end
 end
 

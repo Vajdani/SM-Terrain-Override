@@ -469,7 +469,7 @@ function InitTileList()
 	-- 	"name" : "Terrain Assets Basics"
 	-- },
 	-- {
-	-- 	fileId" : 1339396219,
+	-- 	"fileId" : 1339396219,
 	-- 	"localId" : "bb031b9b-1fdc-431b-a47f-7161d8b1fc76"
 	-- }
 
@@ -486,6 +486,16 @@ function InitTileList()
 	-- g_terrainTileList[#g_terrainTileList + 1] = AddTile( 79, "$CONTENT_e7208a0d-860f-4ccb-a765-6a98b1ad6ba7/Gold Mine.tile" )
 	-- g_terrainTileList[#g_terrainTileList + 1] = AddTile( 80, "$CONTENT_57a05c09-0ef3-4add-8771-ff956dd5d308/Boat Race.tile" )
 	-- g_terrainTileList[#g_terrainTileList + 1] = AddTile( 81, "$CONTENT_eabc56f9-e1f6-46c8-a604-512aeb6b19fb/Five Pebbles iterator Can [Rain World].tile" )
+
+
+
+
+	--Load custom tiles from addons
+	local tiles = sm.terrainGeneration.loadGameStorage(TERRAINOVERRIDEMODUUID.."_tileList") or {}
+	for k, tilePath in pairs(tiles) do
+		g_terrainTileList[#g_terrainTileList + 1] = AddTile( nil, tilePath )
+	end
+
 
 
 
