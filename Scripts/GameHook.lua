@@ -93,9 +93,9 @@ local function attemptChatBindHook()
         sm.log.warning("[TERRAIN OVERRIDE] CHAT BIND HOOK BEGIN")
         commandsLoaded = true
 
-        if sm.isHost then
-            sm.game.bindChatCommand("/switchTerrain", {}, "cl_onChatCommand", "Open a menu that lets you adjust the terrain.")
-        end
+        -- if sm.isHost then
+        --     sm.game.bindChatCommand("/switchTerrain", {}, "cl_onChatCommand", "Open a menu that lets you adjust the terrain.")
+        -- end
     end
 
     attemptHook()
