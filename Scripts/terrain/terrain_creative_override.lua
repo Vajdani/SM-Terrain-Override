@@ -16,13 +16,14 @@ dofile("$SURVIVAL_DATA/scripts/terrain/overworld/tile_database.lua")
 ----------------------------------------------------------------------------------------------------
 
 --How many cells wide the water border should be.
-local WATER_WIDTH = 12
+local WATER_WIDTH = 32
+local WORLD_SIZE = 128
 
 function Init()
 	print( "Initializing creative terrain" )
 
 	--The world's size, minus 4 cells for the beaches, minus the water width.
-	BORDER_START = (64 - 4 - WATER_WIDTH) * CELL_SIZE
+	BORDER_START = (WORLD_SIZE - 4 - WATER_WIDTH) * CELL_SIZE
 	BORDER_END = BORDER_START + CELL_SIZE
 
 	BEACH_FIRST_START = BORDER_END
@@ -168,7 +169,7 @@ function UpgradeCellData( cellData )
 	end
 
 	if cellData.version < 1337 then
-		Create( -64, 63, -64, 63, cellData.seed )
+		Create( -WORLD_SIZE, WORLD_SIZE - 1, -WORLD_SIZE, WORLD_SIZE - 1, cellData.seed )
 
 		cellData.version = 1337
 		upgraded = true
@@ -234,7 +235,7 @@ function GetColorAt( x, y, lod )
 	local noise = sm.noise.octaveNoise2d( x / 8, y / 8, 5, 45 )
 	local brightness = noise * 0.25 + 0.75
 	local color = { r, g, b }
-	
+
 	local desertColor = { 255 / 255, 171 / 255, 111 / 255 }
 
 	local maxDist = math.max( math.abs(x), math.abs(y) )

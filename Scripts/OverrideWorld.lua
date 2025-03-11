@@ -45,7 +45,7 @@ classInstance.groundMaterialSet = terrainType.materials
 --Increase the world size to 128 by 128 cells.
 --The reason why cellMaxX and cellMaxY are one cell less, is because
 --0,0 counts as a cell too, so we need to subtract 1 from it.
-local size = 64
+local size = 128
 classInstance.cellMinX = -size
 classInstance.cellMaxX = size - 1
 classInstance.cellMinY = -size
