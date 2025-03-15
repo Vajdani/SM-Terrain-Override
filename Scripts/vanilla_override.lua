@@ -58,8 +58,11 @@ sm[sm.TERRAINOVERRIDEMODUUID .. "_createOverrideWorld"] = function(filename, cla
     return sm[sm.TERRAINOVERRIDEMODUUID .. "_oldCreateWorld"]("$CONTENT_" .. sm.TERRAINOVERRIDEMODUUID .. "/Scripts/OverrideWorld.lua", classname, terrainParams, seed)
 end
 
+
+--Search for a game class among the globals.
 for k, v in pairs(_G) do
     if type(v) == "table" and v.server_onPlayerJoined then
+        --Add our terrain type saving function to the game class.
         function v:server_saveNewTerrainData()
             sm.storage.saveAndSync(sm.TERRAINOVERRIDEMODUUID, sm[sm.TERRAINOVERRIDEMODUUID])
         end
@@ -67,13 +70,19 @@ for k, v in pairs(_G) do
 end
 
 
+--Below is the code that handles when the player adds the mod
+--onto a world *after* it has been created.
 
+--Set up the world size. It is 1 tile smaller than maximum, because
+--of the world border gate tiles not displaying if there isn't any space
+--for them.
 local size = 127
 local cellMinX = -size
 local cellMaxX = size - 1
 local cellMinY = -size
 local cellMaxY = size - 1
 
+--The terrain values for each terrain type.
 local fieldReplacements = {
     {
         terrainScript = ("$CONTENT_%s/Scripts/terrain/%s.lua"):format(sm.TERRAINOVERRIDEMODUUID, "terrain_creative_override"),
@@ -142,7 +151,7 @@ function class(super)
         if terrainData[k] ~= nil then
             cls[k] = terrainData[k]
 
-            --Some parameters may not get set by the game, so we make sure to set them manually.
+            --Some parameters don't get set by the game, so we make sure to set them manually.
             cls["isStatic"] = terrainData.isStatic
             cls["groundMaterialSet"] = terrainData.groundMaterialSet
         else

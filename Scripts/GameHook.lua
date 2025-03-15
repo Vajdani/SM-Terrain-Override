@@ -1,31 +1,47 @@
 ---@diagnostic disable:duplicate-set-field
 
+--Toggles whether the host can adjust the terrain type or not.
+--Disabled by default, can't be toggled from in-game.
+TERRAINTYPESWITCHENABLED = false
+
+--This class is for handling the terrain switching functionality. 
 ---@class GameHook : ToolClass
 GameHook = class()
 
 function GameHook:server_onCreate()
+    --Don't do anything if there is an instance already.
+    --Since this is an autotool, an instance is created for each player.
     if g_terrainOverrideGameHook then return end
 
     g_terrainOverrideGameHook = self.tool
 
+    --Load the mod's description file, and append any new dependencies
+    --that might have been loaded during terrain loading.
     local description = sm.json.open("$CONTENT_DATA/description.json")
     concat(description.dependencies, newDependencies)
     sm.json.save(description, "$CONTENT_DATA/\\description.json")
 
+    --Cleanup for terrain loading.
     customTiles = nil
     newDependencies = nil
 end
 
 function GameHook:sv_switchTerrain(player)
+    --Send gui open event to the player that typed the command.
     self.network:sendToClient(player, "cl_switchTerrain")
 end
 
 function GameHook:sv_selectTerrain(type)
+    --Set the global terrain type value, and send an event to
+    --the game to save it. It has to be saved in the game environment, or else
+    --it won't be seen by it.
     sm[sm.TERRAINOVERRIDEMODUUID].terrainType = type
     sm.event.sendToGame("server_saveNewTerrainData")
 end
 
 
+
+--Titles for all of the terrain types.
 local terrainTypes = {
     "Standard - 128x128",
     "Flat - 128x128",
@@ -33,17 +49,20 @@ local terrainTypes = {
     -- "Standard - Default size"
 }
 
+--Assamble a dictionary of "terrain type title" -> "index of terrain type"
 local terrainTypeToIndex = {}
 for k, v in pairs(terrainTypes) do
     terrainTypeToIndex[v] = k
 end
 
 function GameHook:cl_switchTerrain()
+    --Create and open the gui that lets the player select the new terrain mode.
     local gui = sm.gui.createGuiFromLayout("$CONTENT_DATA/Gui/switchTerrain.layout", true)
     gui:setText("Name", "Terrain Type")
     gui:setText("SubTitle", "Select which type you'd like")
     gui:createDropDown("items", "cl_selectTerrain", terrainTypes)
 
+    --Set the selected item in the dropdown.
     gui:setSelectedDropDownItem("items", terrainTypes[sm[sm.TERRAINOVERRIDEMODUUID].terrainType])
 
     gui:open()
@@ -52,11 +71,16 @@ function GameHook:cl_switchTerrain()
 end
 
 function GameHook:cl_selectTerrain(option)
+    --Get the index of the terrain type from the name.
     local index = terrainTypeToIndex[option]
+
+    --If its the selected type, don't do anything.
     if index == sm[sm.TERRAINOVERRIDEMODUUID].terrainType then return end
 
+    --Send an event to the server to save the change.
     self.network:sendToServer("sv_selectTerrain", index)
 
+    --Close gui, print warning in the chat.
     self.gui:close()
     sm.gui.chatMessage("Reenter the world for the change to take effect!")
 end
@@ -80,11 +104,19 @@ sm.TERRAINOVERRIDEMODUUID = description.localId
 --Whether the mod's override script has been injected
 gameHooked = gameHooked or false
 
+--Whether the mods's custom chat commands have been injected
 commandsLoaded = commandsLoaded or false
 
+--Whether the custom tile addons have been injected
+customTilesLoaded = customTilesLoaded or false
+
+--Import the ModDatabase class that we'll later use for
+--detecting custom tile addons.
 dofile("$CONTENT_40639a2c-bb9f-4d4f-b88c-41bfe264ffa8/Scripts/ModDatabase.lua")
 
+--Loads the custom tiles' data.
 local function loadCustomTiles()
+    --Don't do anything if we have loaded the data.
     if customTilesLoaded then return end
 
     local function concat( a, b )
@@ -93,24 +125,49 @@ local function loadCustomTiles()
         end
     end
 
+    --Initialise the mod database.
     ModDatabase.loadShapesets()
-    customTiles = {}
+    customTiles = {
+        added = {},
+        removed = {}
+    }
     newDependencies = {}
 
+    --Tiles can have asset packs for custom terrain assets.
+    --The game does not import them on it's own, so we need to do it
+    --ourselves. This can be done by adding those asset packs to
+    --the mod's dependencies. A world reload will be required for the
+    --change to take effect.
+    --I have not tested if this works in multiplayer.
+
+    --Assamble a list of already imported dependencies. This will be used
+    --to avoid duplicate entries in the mod's dependencies list.
     local presentDependencies = {}
     for k, v in pairs(description.dependencies) do
         presentDependencies[v.localId] = true
     end
 
+    --Loop over all mods detected by the database.
     for k, uuid in pairs(ModDatabase.getAllLoadedMods()) do
+        --The path to the tile list in the addon.
         local path = ("$CONTENT_%s/tileList.json"):format(uuid)
-        local success, result = pcall(sm.json.fileExists, path)
-        if success and result then
-            local data = sm.json.open(path)
-            concat(customTiles, data.tiles)
 
+        --Can't calle fileExists directly, will throw an error.
+        --pcall() allows us to get around this.
+        local success, result = pcall(sm.json.fileExists, path)
+
+        --Was the call successful, does the file exist?
+        if success and result then
+            --Open the file and append it to the customTiles table.
+            local data = sm.json.open(path)
+            concat(customTiles.added, data.addedTiles or {})
+            concat(customTiles.removed, data.removedTiles or {})
+
+            --Loop over the addon's dependencies.
             for _k, dependency in pairs(data.dependencies or {}) do
+                --Are we missing the asset pack?
                 if presentDependencies[dependency.localId] == nil then
+                    --Add it to the list.
                     presentDependencies[dependency.localId] = true
                     table.insert(newDependencies, dependency)
                 end
@@ -118,6 +175,7 @@ local function loadCustomTiles()
         end
     end
 
+    --Clean up the database, we don't need it anymore.
     ModDatabase.unloadShapesets()
 
     customTilesLoaded = true
@@ -140,20 +198,21 @@ local function attemptHook()
 
         loadCustomTiles()
 
-        sm.storage.save(sm.TERRAINOVERRIDEMODUUID.."_tileList", customTiles)
+        sm.storage.saveAndSync(sm.TERRAINOVERRIDEMODUUID.."_tileList", customTiles)
         --sm.json.save(tiles, "$CONTENT_"..sm.TERRAINOVERRIDEMODUUID.."/customTileList.json")
     end
 end
 
+--Loads the mod's custom chat commands
 local function attemptChatBindHook()
     sm.log.warning("[TERRAIN OVERRIDE] TRY CHAT BIND HOOK")
-    if not commandsLoaded then
+    if not commandsLoaded then --Have the commands been loaded yet?
         sm.log.warning("[TERRAIN OVERRIDE] CHAT BIND HOOK BEGIN")
-        commandsLoaded = true
+        commandsLoaded = true --Now they have.
 
-        -- if sm.isHost then
-        --     sm.game.bindChatCommand("/switchTerrain", {}, "cl_onChatCommand", "Open a menu that lets you adjust the terrain.")
-        -- end
+        if TERRAINTYPESWITCHENABLED and sm.isHost then
+            sm.game.bindChatCommand("/switchTerrain", {}, "cl_onChatCommand", "Open a menu that lets you adjust the terrain.")
+        end
     end
 
     attemptHook()
@@ -191,16 +250,23 @@ function sm.world.createWorld(filename, classname, terrainParams, seed)
     return sm[sm.TERRAINOVERRIDEMODUUID.."_createOverrideWorld"](filename, classname, terrainParams, seed)
 end
 
-
-
+--When the game script processes the chat command, if it doesn't find
+--a match, it sends an event to the world script.
+--Here we intercept the event to inject the code for our custom commands.
 oldWorldEvent = oldWorldEvent or sm.event.sendToWorld
 function sm.event.sendToWorld(world, callback, args)
-    if callback ~= "sv_e_onChatCommand" then
-        return oldWorldEvent(world, callback, args)
+    --Is this a chat command event? If it is, we can execute the code
+    --for our commands.
+    if callback == "sv_e_onChatCommand" then
+        --Check the command string and implement the command's
+        --functionality if there is a match.
+        local command = args[1]
+        if command == "/switchTerrain" then
+            --Send an event over to our GameHook class, where our code is.
+            sm.event.sendToTool(g_terrainOverrideGameHook, "sv_switchTerrain", args.player)
+        end
     end
 
-    local command = args[1]
-    if command == "/switchTerrain" then
-        sm.event.sendToTool(g_terrainOverrideGameHook, "sv_switchTerrain", args.player)
-    end
+    --Make sure to pass the event on, other mods use this method too.
+    return oldWorldEvent(world, callback, args)
 end

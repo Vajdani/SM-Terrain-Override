@@ -138,7 +138,7 @@ function getSuitableTile( x, y, maxSize, seed )
 
 	--step a number of suitable tiles forward and return the last one
 	local index = 1
-	while index <= #g_terrainTileList do
+	while index < #g_terrainTileList do
 		local uid = g_terrainTileList[index]
 		if g_useCounts[tostring(uid)] == lowestUsage then
 			size = GetSize( uid )
@@ -172,7 +172,7 @@ function getLargestSuitableTile( x, y, maxSize, seed )
 
 	--step a number of suitable tiles forward and return the last one
 	local index = 1
-	while index <= #g_terrainTileList do
+	while index < #g_terrainTileList do
 		local uid = g_terrainTileList[index]
 		if g_useCounts[tostring(uid)] == lowestUsage then
 			size = GetSize( uid )
@@ -201,7 +201,7 @@ function getSuitableTileCount( maxSize, minSize )
 	local lowestUsage = 1000 --Just a big number, no singe tile should be use this many times with the current map size
 	local index = 1
 
-	while index <= #g_terrainTileList do
+	while index < #g_terrainTileList do
 		local uid = g_terrainTileList[index]
 		local size = GetSize( uid )
 		if size <= maxSize and size >= minSize then
@@ -492,7 +492,23 @@ function InitTileList()
 
 	--Load custom tiles from addons
 	local tiles = sm.terrainGeneration.loadGameStorage(TERRAINOVERRIDEMODUUID.."_tileList") or {}
-	for k, tilePath in pairs(tiles) do
+	if #tiles.removed > 0 then
+		local shouldRemove = {}
+		for k, path in pairs(tiles.removed) do
+			shouldRemove[path] = true
+		end
+
+		local newTerrainTiles = {}
+		for k, uuid in pairs(g_terrainTileList) do
+			if shouldRemove[GetPath(uuid)] == nil then
+				table.insert(newTerrainTiles, uuid)
+			end
+		end
+
+		g_terrainTileList = newTerrainTiles
+	end
+
+	for k, tilePath in pairs(tiles.added) do
 		g_terrainTileList[#g_terrainTileList + 1] = AddTile( nil, tilePath )
 	end
 
