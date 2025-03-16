@@ -17,7 +17,7 @@ If you wish to make such an addon, here is what you need to do:
 1. Make a new mod in the mod tool.
 2. Make a `tileList.json` file in the root folder of the mod.\
 The file contains information about added and removed tiles.\
-Here is an example of an addon file:
+Example for the tile list file:
 ```json
 {
     "addedTiles": [
@@ -50,7 +50,7 @@ Here is an example of an addon file:
 }
 ```
 3. Add the tiles and the tiles' dependencies to the dependencies of the mod, in `description.json`.\
-Here is what it would look like for this example addon:
+Example for the file:
 ```json
 {
     "allow_add_mods" : true,
@@ -91,7 +91,7 @@ Here is what it would look like for this example addon:
 ```
 4. Go to `Objects\Database\ShapeSets\example.shapeset`, and add a dummy shape.\
 Make sure to hide it from the inventory, since the shape will only be used to register in the **Mod Database**.\
-Here is an example for the shapeset, don't forget to change the `UUID` property:
+Example for the shapeset, don't forget to change the `UUID` property:
 ```json
 {
     "blockList" : [
@@ -116,6 +116,6 @@ Here is an example for the shapeset, don't forget to change the `UUID` property:
 # Forking
 If you wish to use this project as a base for your own:
 1. Rename `description_template.json` to `description.json`, and open the file.\
-Change the `localId` property to a new `UUID` that you generated. (For example, on [this](https://www.uuidgenerator.net/version4) website)
-2. Change `GameHook` autoTool's `UUID` in `Tools/DataBase/ToolSets/tools.toolset` to a new `UUID`.
-3. If you wish to use the default terrain generation script, you will also have to change the mod `UUID` in `Scripts/terrain_creative_override.lua` to the one you generated in **step 1**.
+Change the `localId` property to a new UUID that you generated. (For example, on [this](https://www.uuidgenerator.net/version4) website)
+2. Change `GameHook` autoTool's UUID in `Tools/DataBase/ToolSets/tools.toolset` to a new UUID.
+3. If you wish to use the default terrain generation script, you will also have to change the mod UUID in `Scripts/terrain/terrain_creative_override.lua` to the one you generated in **step 1**.
