@@ -119,18 +119,21 @@ local function loadCustomTiles()
     --Don't do anything if we have loaded the data.
     if customTilesLoaded then return end
 
-    local function concat( a, b )
-        for _, v in ipairs( b ) do
-            a[#a+1] = v;
-        end
-    end
+    --The tiles are beind loaded.
+    --We must set this here, and not later, or else the sm.storage.load() call
+    --under this would cause an infinite loop.
+    customTilesLoaded = true
 
     --Initialise the mod database.
     ModDatabase.loadShapesets()
-    customTiles = {
+
+    --Set up the tiles table, load the saved data or default to nothing.
+    customTiles = sm.storage.load(sm.TERRAINOVERRIDEMODUUID.."_tileList") or {
         added = {},
         removed = {}
     }
+
+    --Table for any new asset pack dependencies that have been detected.
     newDependencies = {}
 
     --Tiles can have asset packs for custom terrain assets.
@@ -147,21 +150,52 @@ local function loadCustomTiles()
         presentDependencies[v.localId] = true
     end
 
+    --Function from Survival/Scripts/util.lua, checks if value is in array.
+    local function isAnyOf(is, off)
+        for _, v in pairs(off) do
+            if is == v then
+                return true
+            end
+        end
+        return false
+    end
+
+    --Function that checks if the new tiles are present yet, if not,
+    --it adds them. It also removes them from the opposite tile list if present.
+    local function AddTiles(addTo, removeFrom, newTiles)
+        for k, path in pairs(newTiles) do
+            --Is the new tile in the table we are adding to?
+            if not isAnyOf(path, addTo) then
+                table.insert(addTo, path) --Insert if so.
+            end
+
+            --Find the index of the new tile in the table we are
+            --removing from, and remove it by index, if its found.
+            for removedTileId, removedTilePath in pairs(removeFrom) do
+                if path == removedTilePath then --New tile found in the list.
+                    table.remove(removeFrom, removedTileId) --Remove it.
+                end
+            end
+        end
+    end
+
     --Loop over all mods detected by the database.
     for k, uuid in pairs(ModDatabase.getAllLoadedMods()) do
         --The path to the tile list in the addon.
-        local path = ("$CONTENT_%s/tileList.json"):format(uuid)
+        local tileListPath = ("$CONTENT_%s/tileList.json"):format(uuid)
 
         --Can't calle fileExists directly, will throw an error.
         --pcall() allows us to get around this.
-        local success, result = pcall(sm.json.fileExists, path)
+        local success, result = pcall(sm.json.fileExists, tileListPath)
 
         --Was the call successful, does the file exist?
         if success and result then
             --Open the file and append it to the customTiles table.
-            local data = sm.json.open(path)
-            concat(customTiles.added, data.addedTiles or {})
-            concat(customTiles.removed, data.removedTiles or {})
+            local data = sm.json.open(tileListPath)
+
+            --Add the tiles to the list.
+            AddTiles(customTiles.added, customTiles.removed, data.addedTiles or {})
+            AddTiles(customTiles.removed, customTiles.added, data.removedTiles or {})
 
             --Loop over the addon's dependencies.
             for _k, dependency in pairs(data.dependencies or {}) do
@@ -177,8 +211,6 @@ local function loadCustomTiles()
 
     --Clean up the database, we don't need it anymore.
     ModDatabase.unloadShapesets()
-
-    customTilesLoaded = true
 end
 
 
