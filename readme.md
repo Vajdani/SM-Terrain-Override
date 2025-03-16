@@ -68,8 +68,31 @@ Here is an example of an addon file:
     ]
 }
 ```
+3. Go to `Objects\Database\ShapeSets\example.shapeset`, and add a dummy shape.\
+Make sure to hide it from the inventory, since the shape will only be used to register in the **Mod Database**.\
+Here is an example for the shapeset, don't forget to change the `UUID` property:
+```json
+{
+    "blockList" : [
+        {
+            "asg" : "$GAME_DATA/Textures/Default/default_dif.tga",
+            "dif" : "$GAME_DATA/Textures/Default/default_asg.tga",
+            "name" : "obj_plaseloadmymod",
+            "nor" : "$GAME_DATA/Textures/Default/default_nor.tga",
+            "physicsMaterial" : "Default",
+            "showInInventory" : false,
+            "tiling" : 8,
+            "uuid" : "your_new_uuid_here"
+        }
+    ]
+}
+```
+4. Publish the mod on the workshop, and wait until the **Mod Database** updates.
+5. Enjoy your custom terrain generation!
 
 # Forking
 If you wish to use this project as a base for your own:
-- Don't forget to change the mod's `localId` and `fileId`(just remove it from the file, the mod tool will set it automatically) in `description.json`, and the GameHook autoTool's uuid in `Tools/DataBase/ToolSets/tools.toolset`.
-- If you wish to use the default terrain generation script, you will also have to change the mod UUID in `Scripts/terrain_creative_override.lua`
+1. Rename `description_template.json` to `description.json`, and open the file.\
+Change the `localId` property to a new `UUID` that you generated. (For example, on [this](https://www.uuidgenerator.net/version4) website)
+2. Change `GameHook` autoTool's `UUID` in `Tools/DataBase/ToolSets/tools.toolset` to a new `UUID`.
+3. If you wish to use the default terrain generation script, you will also have to change the mod `UUID` in `Scripts/terrain_creative_override.lua` to the one you generated in **step 1**.
