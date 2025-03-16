@@ -17,7 +17,6 @@ If you wish to make such an addon, here is what you need to do:
 1. Make a new mod in the mod tool.
 2. Make a `tileList.json` file in the root folder of the mod.\
 The file contains information about added and removed tiles. It also contains any potential dependencies that the added tiles may have.\
-
 Here is an example of an addon file:
 ```json
 {
