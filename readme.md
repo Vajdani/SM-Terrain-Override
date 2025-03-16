@@ -6,7 +6,7 @@ The maximum size for a SM world is 256x256 cells, this mod offers a play area of
 Due to the world being so large, chunk loading has been enabled, since creative worlds are always fully loaded.
 
 The mod also features functionality for switching between different terrain types, but this is disabled by default due to being unfinished.
-The `TERRAINTYPESWITCHENABLED` flag can be toggled in Scripts/GameHook.lua, if you wish to enable it.
+The `TERRAINTYPESWITCHENABLED` flag can be toggled in `Scripts/GameHook.lua`, if you wish to enable it.
 
 # Addons
 The mod features addon support, which can:
@@ -116,6 +116,6 @@ Example for the shapeset, don't forget to change the `UUID` property:
 # Forking
 If you wish to use this project as a base for your own:
 1. Rename `description_template.json` to `description.json`, and open the file.\
-Change the `localId` property to a new UUID that you generated. (For example, on [this](https://www.uuidgenerator.net/version4) website)
+Change the `localId` property to a new UUID that you generated(For example, on [this](https://www.uuidgenerator.net/version4) website), and give the mod a name and a description.
 2. Change `GameHook` autoTool's UUID in `Tools/DataBase/ToolSets/tools.toolset` to a new UUID.
 3. If you wish to use the default terrain generation script, you will also have to change the mod UUID in `Scripts/terrain/terrain_creative_override.lua` to the one you generated in **step 1**.
