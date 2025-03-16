@@ -16,7 +16,8 @@ The mod features addon support, which can:
 If you wish to make such an addon, here is what you need to do:
 1. Make a new mod in the mod tool.
 2. Make a `tileList.json` file in the root folder of the mod.\
-The file contains information about added and removed tiles. It also contains any potential dependencies that the added tiles may have.
+The file contains information about added and removed tiles. It also contains any potential dependencies that the added tiles may have.\
+
 Here is an example of an addon file:
 ```json
 {
@@ -70,5 +71,6 @@ Here is an example of an addon file:
 ```
 
 # Forking
-Don't forget to change the mod's UUID in description.json, and the GameHoook autoTool's uuid in `Tools/DataBase/ToolSets/tools.toolset`.
-If you wish to use the default terrain generation script, you will also have to change the mod UUID in Scripts/terrain_creative_override.lua
+If you wish to use this project as a base for your own:
+- Don't forget to change the mod's `localId` and `fileId`(just remove it from the file, the mod tool will set it automatically) in `description.json`, and the GameHook autoTool's uuid in `Tools/DataBase/ToolSets/tools.toolset`.
+- If you wish to use the default terrain generation script, you will also have to change the mod UUID in `Scripts/terrain_creative_override.lua`
