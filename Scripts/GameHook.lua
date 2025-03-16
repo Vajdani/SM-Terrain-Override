@@ -15,15 +15,8 @@ function GameHook:server_onCreate()
 
     g_terrainOverrideGameHook = self.tool
 
-    --Load the mod's description file, and append any new dependencies
-    --that might have been loaded during terrain loading.
-    local description = sm.json.open("$CONTENT_DATA/description.json")
-    concat(description.dependencies, newDependencies)
-    sm.json.save(description, "$CONTENT_DATA/\\description.json")
-
     --Cleanup for terrain loading.
     customTiles = nil
-    newDependencies = nil
 end
 
 function GameHook:sv_switchTerrain(player)
@@ -133,23 +126,6 @@ local function loadCustomTiles()
         removed = {}
     }
 
-    --Table for any new asset pack dependencies that have been detected.
-    newDependencies = {}
-
-    --Tiles can have asset packs for custom terrain assets.
-    --The game does not import them on it's own, so we need to do it
-    --ourselves. This can be done by adding those asset packs to
-    --the mod's dependencies. A world reload will be required for the
-    --change to take effect.
-    --I have not tested if this works in multiplayer.
-
-    --Assamble a list of already imported dependencies. This will be used
-    --to avoid duplicate entries in the mod's dependencies list.
-    local presentDependencies = {}
-    for k, v in pairs(description.dependencies) do
-        presentDependencies[v.localId] = true
-    end
-
     --Function from Survival/Scripts/util.lua, checks if value is in array.
     local function isAnyOf(is, off)
         for _, v in pairs(off) do
@@ -196,16 +172,6 @@ local function loadCustomTiles()
             --Add the tiles to the list.
             AddTiles(customTiles.added, customTiles.removed, data.addedTiles or {})
             AddTiles(customTiles.removed, customTiles.added, data.removedTiles or {})
-
-            --Loop over the addon's dependencies.
-            for _k, dependency in pairs(data.dependencies or {}) do
-                --Are we missing the asset pack?
-                if presentDependencies[dependency.localId] == nil then
-                    --Add it to the list.
-                    presentDependencies[dependency.localId] = true
-                    table.insert(newDependencies, dependency)
-                end
-            end
         end
     end
 

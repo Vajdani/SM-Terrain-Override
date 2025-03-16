@@ -16,7 +16,7 @@ The mod features addon support, which can:
 If you wish to make such an addon, here is what you need to do:
 1. Make a new mod in the mod tool.
 2. Make a `tileList.json` file in the root folder of the mod.\
-The file contains information about added and removed tiles. It also contains any potential dependencies that the added tiles may have.\
+The file contains information about added and removed tiles.\
 Here is an example of an addon file:
 ```json
 {
@@ -46,15 +46,31 @@ Here is an example of an addon file:
         //If you included a tile in the "addedTiles" section, but also included
         //it here, it will be removed as well.
         "$CONTENT_db6fc376-bf15-4ef0-8e8c-d621afeae424/Scraptopia City Airport.tile"
-    ],
-    "dependencies": [
-        //List of dependencies.
-
-        //A dependency object.
+    ]
+}
+```
+3. Add the tiles and the tiles' dependencies to the dependencies of the mod, in `description.json`.\
+Here is what it would look like for this example addon:
+```json
+{
+    "allow_add_mods" : true,
+    "custom_icons" : false,
+    "dependencies" : [
+        //The two tiles.
         {
-            "fileId" : 1331879173, //Workshop file id.
-            "localId" : "740ff0f9-9700-4ace-a980-5099bd3807f4", //Uuid of the pack.
-            "name" : "Terrain Assets by Lord Pain" //Name of the pack, optional.
+            "fileId" : 1441717025, //Workshop id of the tile.
+            "localId" : "e7208a0d-860f-4ccb-a765-6a98b1ad6ba7" //UUID of the mod.
+        },
+        {
+            "fileId" : 2424799239,
+            "localId" : "57a05c09-0ef3-4add-8771-ff956dd5d308"
+        },
+
+        //The dependencies of the two tiles.
+        {
+            "fileId" : 1331879173, //Workshop id of the asset pack.
+            "localId" : "740ff0f9-9700-4ace-a980-5099bd3807f4", //UUID of the asset pack.
+            "name" : "Terrain Assets by Lord Pain" //Name of the asset pack, optional.
         },
         {
             "fileId" : 1339396219,
@@ -65,10 +81,15 @@ Here is an example of an addon file:
             "localId" : "4345e76b-f43a-4f9a-b2ea-0f11735e183c",
             "name" : "Terrain Assets by sKITzo"
         }
-    ]
+    ],
+    "description" : "your_addon_description_here",
+	"localId" : "your_addon_uuid_here",
+	"name" : "your_addon_name_here",
+    "type" : "Blocks and Parts",
+    "version" : 1
 }
 ```
-3. Go to `Objects\Database\ShapeSets\example.shapeset`, and add a dummy shape.\
+4. Go to `Objects\Database\ShapeSets\example.shapeset`, and add a dummy shape.\
 Make sure to hide it from the inventory, since the shape will only be used to register in the **Mod Database**.\
 Here is an example for the shapeset, don't forget to change the `UUID` property:
 ```json
@@ -87,8 +108,10 @@ Here is an example for the shapeset, don't forget to change the `UUID` property:
     ]
 }
 ```
-4. Publish the mod on the workshop, and wait until the **Mod Database** updates.
-5. Enjoy your custom terrain generation!
+5. Publish the mod on the workshop, and wait until the **Mod Database** updates.
+6. Enjoy your custom tiles in the terrain generation!
+
+**If you would rather download the addon example, you can find it [here](https://github.com/Vajdani/SM-Terrain-Addon-Template).**
 
 # Forking
 If you wish to use this project as a base for your own:
