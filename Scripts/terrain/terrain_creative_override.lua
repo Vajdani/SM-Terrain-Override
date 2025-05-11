@@ -441,6 +441,19 @@ function GetCreationsForCell( cellX, cellY )
 end
 
 ----------------------------------------------------------------------------------------------------
+
+function GetKinematicsForCell( cellX, cellY, lod )
+	local uid, tileCellOffsetX, tileCellOffsetY = GetCellTileUidAndOffset( cellX, cellY )
+	local kinematics = sm.terrainTile.getKinematicsForCell( uid, tileCellOffsetX, tileCellOffsetY, lod )
+	for _, kinematic in ipairs( kinematics ) do
+		local rx, ry = RotateLocal( cellX, cellY, kinematic.pos.x, kinematic.pos.y )
+		kinematic.pos = sm.vec3.new( rx, ry, kinematic.pos.z )
+		kinematic.rot = GetRotationQuat( cellX, cellY ) * kinematic.rot
+	end
+	return kinematics
+end
+
+----------------------------------------------------------------------------------------------------
 -- Tile Reader Path Getter
 ----------------------------------------------------------------------------------------------------
 
